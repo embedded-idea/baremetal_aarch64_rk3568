@@ -64,14 +64,14 @@ static inline u32 readl(void *addr)
 //GPIO0_A will be 0-7, GPIO0_B will be 8-15, GPIO0_C will be 16-23, GPIO0_D will be 24-31
 static int rockchip_gpio_direction_input(unsigned offset)
 {
-	struct rockchip_gpio_regs *regs = GPIO0_BASE;
+	struct rockchip_gpio_regs *regs = (struct rockchip_gpio_regs *)GPIO0_BASE;
 	CLRBITS_LE32(&regs->swport_ddr, OFFSET_TO_BIT(offset));
 	return 0;
 }
 
 static int rockchip_gpio_direction_output(unsigned offset, int value)
 {
-	struct rockchip_gpio_regs *regs = GPIO0_BASE;
+	struct rockchip_gpio_regs *regs = (struct rockchip_gpio_regs *)GPIO0_BASE;
 	int mask = OFFSET_TO_BIT(offset);
 	CLRSETBITS_LE32(&regs->swport_dr, mask, value ? mask : 0);
 	SETBITS_LE32(&regs->swport_ddr, mask);
@@ -80,14 +80,14 @@ static int rockchip_gpio_direction_output(unsigned offset, int value)
 
 static int rockchip_gpio_get_value(unsigned offset)
 {
-	struct rockchip_gpio_regs *regs = GPIO0_BASE;
+	struct rockchip_gpio_regs *regs = (struct rockchip_gpio_regs *)GPIO0_BASE;
 	return readl(&regs->ext_port) & OFFSET_TO_BIT(offset) ? 1 : 0;
 }
 
 static int rockchip_gpio_set_value(unsigned offset, int value)
 {
 
-	struct rockchip_gpio_regs *regs = GPIO0_BASE;
+	struct rockchip_gpio_regs *regs = (struct rockchip_gpio_regs *)GPIO0_BASE;
 	int mask = OFFSET_TO_BIT(offset);
 	CLRSETBITS_LE32(&regs->swport_dr, mask, value ? mask : 0);
 	return 0;
@@ -100,25 +100,44 @@ static void delay(uint64_t count) {
     for (volatile uint64_t i = 0; i < count; i++);
 }
 
+// UART send string
+static void uart_puts(const char *str) {
+    char c;
+    while ((c = *str++) != '\0') {
+        // manual add \r for \n
+        if (c == '\n' ) {
+            _debug_uart_putc('\r');
+        }
+        _debug_uart_putc(c);
+    }
+}
+
+static void welcome()
+{
+    _debug_uart_putc('H');
+    _debug_uart_putc('e');
+    _debug_uart_putc('l');
+    _debug_uart_putc('l');
+    _debug_uart_putc('o');
+    _debug_uart_putc('-');
+    uart_puts("ARMv8-A (AArch64) Baremetal Program\n");
+    uart_puts("UART: 1500000 8N1\n");
+    uart_puts("press any key and enter to continue\n");
+}
 int main(int argc, char *argv[])
 {
     int ch=0;
     rockchip_gpio_direction_output(23,1);
     board_debug_uart_init();
     _debug_uart_init();
-    _debug_uart_putc('H');
-    // _debug_uart_putc('e');
-    // _debug_uart_putc('l');
-    // _debug_uart_putc('l');
-    // _debug_uart_putc('o');
-
+    welcome();
+    ch = _debug_uart_getc();
     while (1) {
         delay(90000000);  // delay about 500ms
         rockchip_gpio_set_value(23, 0);
-        ch = _debug_uart_getc();
         delay(90000000);  // delay about 500ms
         rockchip_gpio_set_value(23, 1);
-        _debug_uart_putc(ch);
+        _debug_uart_putc('o');
     }
     return 0;
 }

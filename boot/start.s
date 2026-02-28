@@ -12,3 +12,4 @@ _reset:
 loop:
 	MOV X13, #0x7777
     b   loop
+
