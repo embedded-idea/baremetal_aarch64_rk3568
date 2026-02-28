@@ -1,17 +1,6 @@
 #include <stdint.h>
-
-typedef signed char s8;
-typedef unsigned char u8;
-
-typedef signed short s16;
-typedef unsigned short u16;
-
-typedef signed int s32;
-typedef unsigned int u32;
-
-typedef signed long long s64;
-typedef unsigned long long u64;
-
+#include "main.h"
+#include "uart.h"
 #define GPIO0_BASE        0xfdd60000  // GPIO0 物理基地址
 
 #define OFFSET_TO_BIT(bit)	(1UL << (bit))
@@ -113,12 +102,23 @@ static void delay(uint64_t count) {
 
 int main(int argc, char *argv[])
 {
+    int ch=0;
     rockchip_gpio_direction_output(23,1);
+    board_debug_uart_init();
+    _debug_uart_init();
+    _debug_uart_putc('H');
+    // _debug_uart_putc('e');
+    // _debug_uart_putc('l');
+    // _debug_uart_putc('l');
+    // _debug_uart_putc('o');
+
     while (1) {
         delay(90000000);  // delay about 500ms
         rockchip_gpio_set_value(23, 0);
+        ch = _debug_uart_getc();
         delay(90000000);  // delay about 500ms
         rockchip_gpio_set_value(23, 1);
+        _debug_uart_putc(ch);
     }
     return 0;
 }
