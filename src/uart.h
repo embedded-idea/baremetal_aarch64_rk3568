@@ -52,5 +52,5 @@ int _debug_uart_clrc(void);
 int _debug_uart_flushc(void);
 /* baudrate*/
 int _debug_uart_setbrg(void);
-
+void uart_puts(const char *str);
 #endif

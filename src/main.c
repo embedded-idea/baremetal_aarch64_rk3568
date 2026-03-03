@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "main.h"
 #include "uart.h"
+#include "minix_head.h"
 #define GPIO0_BASE        0xfdd60000  // GPIO0 物理基地址
 
 #define OFFSET_TO_BIT(bit)	(1UL << (bit))
@@ -100,18 +101,6 @@ static void delay(uint64_t count) {
     for (volatile uint64_t i = 0; i < count; i++);
 }
 
-// UART send string
-static void uart_puts(const char *str) {
-    char c;
-    while ((c = *str++) != '\0') {
-        // manual add \r for \n
-        if (c == '\n' ) {
-            _debug_uart_putc('\r');
-        }
-        _debug_uart_putc(c);
-    }
-}
-
 static void welcome()
 {
     _debug_uart_putc('H');
@@ -126,12 +115,24 @@ static void welcome()
 }
 int main(int argc, char *argv[])
 {
-    int ch=0;
+    int ch=0,ret=-5;
     rockchip_gpio_direction_output(23,1);
     board_debug_uart_init();
     _debug_uart_init();
     welcome();
     ch = _debug_uart_getc();
+    // Echo the received character back to the UART
+    _debug_uart_putc(ch);
+
+    //call minix_init to jump to minix kernel
+    ret = minix_init();
+    if(ret != 0){
+        uart_puts("minix_init failed, going to next while loop and halting.\n");
+    }  
+    else{
+        uart_puts("minix_init returned successfully, but we are still in main.c, going to next while loop and halting.\n");
+    }
+
     while (1) {
         delay(90000000);  // delay about 500ms
         rockchip_gpio_set_value(23, 0);

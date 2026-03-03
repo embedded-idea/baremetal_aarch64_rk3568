@@ -994,7 +994,17 @@ void _debug_uart_putc(int ch)
 }
 
 
-
+// UART send string
+void uart_puts(const char *str) {
+    char c;
+    while ((c = *str++) != '\0') {
+        // manual add \r for \n
+        if (c == '\n' ) {
+            _debug_uart_putc('\r');
+        }
+        _debug_uart_putc(c);
+    }
+}
 
 
 int _debug_uart_getc(void)
