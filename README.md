@@ -360,3 +360,13 @@ sudo ./rkdeveloptool wlx uboot min.img
 
 
 
+
+
+###################################################
+###################################################
+###################################################
+# porting minix is huge big work for arm64
+cp ./obj.evbearm-el/destdir.evbearm-el/usr/include/ ../lubancat2/bootloader/baremetal_aarch64_rk3568/src/ -r
+cp ./minix3os_learning/minix ../lubancat2/bootloader/baremetal_aarch64_rk3568/src/ -r
+
+

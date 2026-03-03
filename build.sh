@@ -30,13 +30,14 @@ function check(){
 function build() {
   echo "compiling preparing..."
   c_flag="-g -O0 -ffreestanding -nostdlib"
+  l_flag="-lc -lgcc"
   boot_src="boot"
   src_src="src"
   minix_src="minix_m"
   sys_src="sys"
-  code_define="-D__arm64__ -D_MINIX_SYSTEM -D__minix"
+  code_define="-D__arm64__ -D_MINIX_SYSTEM -D__minix -D_SYSTEM"
 
-  HEADER_INCLUDE="-I./${src_src} -I./${src_src}/${minix_src} -I./${src_src}/${minix_src}/include -I./${src_src}/${minix_src}/include/arch/aarch64 -I-I./${src_src}/${minix_src}/include/${sys_src}"
+  HEADER_INCLUDE="-I./${src_src} -I./${src_src}/${minix_src} -I./${src_src}/include"
 
 
   build_dir="build"
@@ -63,7 +64,7 @@ function build() {
   done
 
   echo "linking..."
-  ${CC} ${c_flag} -T./boot/link.ld $(find ${build_dir} -type f -name "*.o") -o "${build_dir}/min.elf"
+  ${CC} ${c_flag} ${l_flag} -T./boot/link.ld $(find ${build_dir} -type f -name "*.o") -o "${build_dir}/min.elf"
 
   echo "copy binary..."
   ${OBJCOPY} -O binary "${build_dir}/min.elf" "${build_dir}/min.bin"
