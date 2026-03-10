@@ -44,13 +44,21 @@ mmc1 is current device
       420   min.img
 1 file(s), 0 dir(s)
 
-=> fatload  mmc 1:1 0x40100000 min.img
-reading min.img
-420 bytes read in 3 ms (136.7 KiB/s)
+=> fatload  mmc 1:1 0x40100000 min.bin
+reading min.bin
+8608 bytes read in 4 ms (2.1 MiB/s)
 
 => go 0x40100000
 ## Starting application at 0x40100000 ...
-all right you should see the green led flashing with half second interval.
+Hello-ARMv8-A (AArch64) Baremetal Program
+UART: 1500000 8N1
+press any key and enter to continue
+hinit_frame_pointer returned ok
+fake pre_init returned ok
+init_x1_zero returned ok
+kmain with kinfo starting
+we are alive ok just FYI
+minix_init returned
 
 # 6) lets put some knowledge here , let me explain the following files after you compile uboot
 uboot.img(2copied of uboot.itb(has many bins))

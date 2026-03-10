@@ -31,45 +31,44 @@ function build() {
   echo "compiling preparing..."
   c_flag="-g -O0 -ffreestanding -nostdlib"
   l_flag="-lc -lgcc"
-  boot_src="boot"
-  src_src="src"
-  minix_src="minix_m"
-  sys_src="sys"
-  code_define="-D__arm64__ -D_MINIX_SYSTEM -D__minix -D_SYSTEM"
+  BOOT_SRC="boot"
+  SRC_SRC="src"
+  MINIX_S="minix_s"
+  CODE_DEFINE=""
 
-  HEADER_INCLUDE="-I./${src_src} -I./${src_src}/${minix_src} -I./${src_src}/include"
+  HEADER_INCLUDE="-I./${SRC_SRC} -I./${SRC_SRC}/${MINIX_S}"
 
 
   build_dir="build"
   mkdir -p ${build_dir}
 
-  mkdir -p "${build_dir}/${boot_src}"
-  echo "compiling... ${build_dir}/${boot_src}/_start.o"
-  ${CC} ${c_flag} -c ${boot_src}/start.s -o "${build_dir}/${boot_src}/_start.o"
+  mkdir -p "${build_dir}/${BOOT_SRC}"
+  echo "compiling... ${CC} ${c_flag} -c ${BOOT_SRC}/start.s -o "${build_dir}/${BOOT_SRC}/_start.o""
+  ${CC} ${c_flag} -c ${BOOT_SRC}/start.s -o "${build_dir}/${BOOT_SRC}/_start.o"
 
   #compile src
-  for src_file in ${src_src}/*.c; do
+  for src_file in ${SRC_SRC}/*.c; do
     dirpath=$(dirname "$src_file")
     mkdir -p "${build_dir}/${dirpath}"
-    echo "compiling... $src_file"
-    ${CC} ${c_flag} ${HEADER_INCLUDE} ${code_define} -c "$src_file" -o "${build_dir}/${src_file%.c}.o"
+    echo "compiling... ${CC} ${c_flag} ${HEADER_INCLUDE} ${CODE_DEFINE} -c "$src_file" -o "${build_dir}/${src_file%.c}.o""
+    ${CC} ${c_flag} ${HEADER_INCLUDE} ${CODE_DEFINE} -c "$src_file" -o "${build_dir}/${src_file%.c}.o"
   done
 
-  #compile src/minix_m src files
-  for src_file in ${src_src}/${minix_src}/*.c; do
+  #compile src/minix_s src files
+  for src_file in ${SRC_SRC}/${MINIX_S}/*.c; do
     dirpath=$(dirname "$src_file")
     mkdir -p "${build_dir}/${dirpath}"
-    echo "compiling... $src_file"
-    ${CC} ${c_flag} ${HEADER_INCLUDE} ${code_define} -c "$src_file" -o "${build_dir}/${src_file%.c}.o"
+    echo "compiling... ${CC} ${c_flag} ${HEADER_INCLUDE} ${CODE_DEFINE} -c "$src_file" -o "${build_dir}/${src_file%.c}.o""
+    ${CC} ${c_flag} ${HEADER_INCLUDE} ${CODE_DEFINE} -c "$src_file" -o "${build_dir}/${src_file%.c}.o"
   done
 
-  echo "linking..."
+  echo "linking...${CC} ${c_flag} ${l_flag} -T./boot/link.ld $(find ${build_dir} -type f -name "*.o") -o "${build_dir}/min.elf""
   ${CC} ${c_flag} ${l_flag} -T./boot/link.ld $(find ${build_dir} -type f -name "*.o") -o "${build_dir}/min.elf"
 
-  echo "copy binary..."
+  echo "copy binary...${OBJCOPY} -O binary "${build_dir}/min.elf" "${build_dir}/min.bin""
   ${OBJCOPY} -O binary "${build_dir}/min.elf" "${build_dir}/min.bin"
 
-  echo "disassembling..."
+  echo "disassembling...${OBJDUMP} -S "${build_dir}/min.elf" > "${build_dir}/min.disasm""
   ${OBJDUMP} -S "${build_dir}/min.elf" > "${build_dir}/min.disasm"
   cat ${build_dir}/min.disasm
 }
@@ -122,7 +121,7 @@ elif [ "$1" == "build" ]; then
     echo "doing build"
     build
     echo "doing pack"
-    pack
+   pack
 elif [ "$1" == "clean" ]; then
     echo "doing clean"
     clean

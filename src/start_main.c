@@ -1,7 +1,8 @@
 #include <stdint.h>
 #include "start_main.h"
 #include "uart.h"
-#include "minix_head.h"
+#include "minixs_head.h"
+
 #define GPIO0_BASE        0xfdd60000  // GPIO0 物理基地址
 
 #define OFFSET_TO_BIT(bit)	(1UL << (bit))
@@ -127,10 +128,10 @@ int main(int argc, char *argv[])
     //call minix_init to jump to minix kernel
     ret = minix_init();
     if(ret != 0){
-        uart_puts("minix_init failed, going to next while loop and halting.\n");
+        uart_puts("fake minix_init failed, going to next while loop and halting.\n");
     }  
     else{
-        uart_puts("minix_init returned successfully, but we are still in main.c, going to next while loop and halting.\n");
+        uart_puts("fake minix_init returned successfully, but we are still in main.c, going to next while loop and halting.\n");
     }
 
     while (1) {

@@ -1,4 +1,4 @@
-#include "main.h"
+#include "start_main.h"
 #include "uart.h"
 
 #define CONFIG_DEBUG_UART_BASE 0xfe660000
